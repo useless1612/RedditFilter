@@ -1,5 +1,7 @@
 # README
 
+Desktop app die Reddit Posts filtern kann
+
 ## Compile JAVA Code
 
 ```bash
