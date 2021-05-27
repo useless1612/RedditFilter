@@ -8,7 +8,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import com.google.api.client.extensions.appengine.http.UrlFetchTransport;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpContent;
 import com.google.api.client.http.HttpRequest;
@@ -17,8 +16,8 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.UrlEncodedContent;
+import com.google.api.client.http.javanet.NetHttpTransport;
 
-import com.google.appengine.api.utils.SystemProperty;
 
 // Reddit's OAUTH docs are here:
 // https://github.com/reddit/reddit/wiki/OAuth2
@@ -37,7 +36,8 @@ import com.google.appengine.api.utils.SystemProperty;
 public class RedditOAuth {
 
     // This line is GAE specific!  for detecting when running on local admin
-    public static final boolean production = (SystemProperty.Environment.Value.Production == SystemProperty.environment.value());
+    // public static final boolean production = true;
+    // (SystemProperty.Environment.Value.Production == SystemProperty.environment.value());
 
     public static final String OAUTH_API_DOMAIN = "https://oauth.reddit.com";
 
@@ -46,15 +46,15 @@ public class RedditOAuth {
     // https://ssl.reddit.com/api/v1/authorize?client_id=CLIENT_ID&response_type=TYPE&state=RANDOM_STRING&redirect_uri=URI&duration=DURATION&scope=SCOPE_STRING
 
     // Step 2. Reddit sends user to REDIRECT_URI
-    private static final String REDIRECT_URI = production ? "http://127.0.0.1:8888" + "/auth"
-            : "http://127.0.0.1:8888/auth";
+    // private static final String REDIRECT_URI = production ? "http://127.0.0.1:8888" + "/auth"
+    //         : "http://127.0.0.1:8888/auth";
 
     // Step 3. Get token
     public static final String OAUTH_TOKEN_URL = "https://ssl.reddit.com/api/v1/access_token";
 
     // I think it is easier to create 2 reddit apps (one with 127.0.0.1 redirect URI)
-    public static final String MY_APP_ID = production ? "NHQGnCG793ryFQ" : "???????";
-    public static final String MY_APP_SECRET = production ? "905JHnVZgHzp2FHc6CQLp6y2fcseEA" : "???????";
+    public static final String MY_APP_ID = "NHQGnCG793ryFQ";
+    public static final String MY_APP_SECRET = "905JHnVZgHzp2FHc6CQLp6y2fcseEA";
 
     public static final String SCOPE_ID = "identity";
 
@@ -62,31 +62,40 @@ public class RedditOAuth {
     public static final String ACCESS_TOKEN_NAME = "access_token";
     public static final String REFRESH_TOKEN_NAME = "refresh_token";
 
+    public static final String USERNAME = "notkillbob8";
+    public static final String PASSWORD = "AsDf1234";
+
     public static boolean permanentAccess = true;
 
+/*
     public static String getUserAuthUrl(String state) {
         String duration = permanentAccess ? "permanent" : "temporary";
         String url = OAUTH_AUTH_URL + "?client_id=" + MY_APP_ID + "&response_type=code&state=" + state
-                + "&redirect_uri=" + REDIRECT_URI + "&duration=" + duration + "&scope=" + "read";
+                + "&redirect_uri=" + REDIRECT_URI + "&duration=" + duration;
 
         // scopes: modposts, identity, edit, flair, history, modconfig, modflair, modlog, modposts, modwiki,
         // mysubreddits, privatemessages, read, report, save, submit, subscribe, vote, wikiedit, wikiread, etc.
         return url;
     }
+*/
 
     // The Google Java HTTP library has a 'pluggable' architecture - the following line selects the URLFetch transport,
     // which is the native HTTP api for GAE.  'NetHttpTransport()' would be a more generic alternative.
-    public static final HttpTransport HTTP_TRANSPORT = new UrlFetchTransport();
+    //public static final HttpTransport HTTP_TRANSPORT = new UrlFetchTransport();
+    public static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
     
     // public static final JsonFactory JSON_FACTORY = new JacksonFactory();
 
-    public static JSONObject getToken(String code) throws IOException {
+    public static JSONObject getToken() throws IOException {
         // Log.v( "getToken for code=" + code );
         GenericUrl url = new GenericUrl(OAUTH_TOKEN_URL);
         Map<String, String> params = new HashMap<String, String>(3);
-        params.put("grant_type", "authorization_code");
-        params.put("code", code);
-        params.put("redirect_uri", REDIRECT_URI);
+        // params.put("grant_type", "authorization_code");
+        // params.put("code", code);
+        // params.put("redirect_uri", REDIRECT_URI);
+        params.put("grant_type", "password");
+        params.put("username", USERNAME);
+        params.put("password", PASSWORD);
         HttpContent hc = new UrlEncodedContent(params);
 
         HttpRequestFactory requestFactory = HTTP_TRANSPORT
@@ -94,7 +103,7 @@ public class RedditOAuth {
                     @Override
                     public void initialize(HttpRequest request) {
                         // request.setParser( new JsonObjectParser(JSON_FACTORY) );
-                        request.getHeaders().setBasicAuthentication(MY_APP_ID, MY_APP_SECRET);
+                        request.getHeaders().setBasicAuthentication(MY_APP_ID, MY_APP_SECRET).setUserAgent("MyBot/0.0.1");
                     }
                 });
 
@@ -234,11 +243,15 @@ public class RedditOAuth {
         return jo;
     }
 
+    public static JSONObject getSubreddit( final String baseUrl, final String subredditName, final SortEnum sortEnum, final String token) throws IOException {
+        return getSubreddit(baseUrl, subredditName, sortEnum, token, 10);
+    }
+
     // A generic get fn to build the rest of my API calls around
-    public static JSONObject get( final String surl, final String token ) throws IOException {
+    public static JSONObject getSubreddit( final String baseUrl, final String subredditName, final SortEnum sortEnum, final String token, final int limit) throws IOException {
         // Log.v( "get for URL=" + surl );
 
-        GenericUrl url = new GenericUrl( surl );
+        GenericUrl url = new SubredditUrl( baseUrl + subredditName.replaceAll("/", "") + "/" + sortEnum.getName() ).setLimit(limit);
 
         HttpRequestFactory requestFactory = HTTP_TRANSPORT
                 .createRequestFactory(new HttpRequestInitializer() {
