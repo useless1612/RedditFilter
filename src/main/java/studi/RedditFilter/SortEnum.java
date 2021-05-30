@@ -2,11 +2,9 @@ package studi.RedditFilter;
 
 public enum SortEnum {
     TOP("top"),
-    CONTROVERSIAL("cont"),
+    CONTROVERSIAL("controversial"),
     HOT("hot"),
-    POPULAR("popular"),
     NEW("new"),
-    RANDOM("random"),
     RISING("rising");
     
 

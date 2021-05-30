@@ -244,7 +244,7 @@ public class RedditOAuth {
     }
 
     public static JSONObject getSubreddit( final String baseUrl, final String subredditName, final SortEnum sortEnum, final String token) throws IOException {
-        return getSubreddit(baseUrl, subredditName, sortEnum, token, 10);
+        return getSubreddit(baseUrl, subredditName, sortEnum, token, 100);
     }
 
     // A generic get fn to build the rest of my API calls around

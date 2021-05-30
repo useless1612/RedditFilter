@@ -149,7 +149,7 @@
           <artifactId>exec-maven-plugin</artifactId>
           <version>1.6.0</version>
           <configuration>
-            <mainClass>studi.RedditFilter.App</mainClass>
+            <mainClass>studi.RedditFilter.GUI</mainClass>
           </configuration>
         </plugin>
       </plugins>

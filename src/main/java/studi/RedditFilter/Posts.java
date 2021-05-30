@@ -85,4 +85,16 @@ public class Posts implements Iterable<Post> {
         }).collect(Collectors.toList());
         return new Posts(filteredPosts);
     }
+
+    public String[][] getPostDataForTable() {
+        List<String[]> list = this.postList.stream().map((Post x) -> { 
+            try {
+                return new String[] { x.getTitle(), "https://reddit.com" + x.getPermalink() };
+            } catch (JSONException e) {
+                System.err.println("Found JSONException while converting Posts data for JTable: " + e.toString());
+                return new String[] { "", "" };
+            }
+        }).collect(Collectors.toList());
+        return (String[][]) list.toArray(new String[0][0]);
+    }
 }
