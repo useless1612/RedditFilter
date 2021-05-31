@@ -23,13 +23,13 @@ public class GUI {
 	private JFrame frame;
 	private JTextField textField_remove;
 	private JTextField textField_keep;
-	private JLabel lblNewLabel_2;
+	private JLabel lbl_subreddit;
 	private JTextField textField_Subreddit;
 	private JScrollPane scrollPane;
 	private JTable table;
 	private DefaultTableModel tableModel;
-	private JLabel lblNewLabel_3;
-	private JLabel lblNewLabel_4;
+	private JLabel lbl_rSlash;
+	private JLabel lbl_sortby;
 	private JButton btnGetPosts;
 
 	/**
@@ -64,27 +64,27 @@ public class GUI {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("remove");
-		lblNewLabel.setBounds(10, 39, 46, 14);
-		frame.getContentPane().add(lblNewLabel);
+		JLabel lbl_remove = new JLabel("remove");
+		lbl_remove.setBounds(10, 39, 46, 14);
+		frame.getContentPane().add(lbl_remove);
 		
 		textField_remove = new JTextField();
 		textField_remove.setBounds(95, 36, 170, 20);
 		frame.getContentPane().add(textField_remove);
 		textField_remove.setColumns(10);
 		
-		JLabel lblNewLabel_1 = new JLabel("keep");
-		lblNewLabel_1.setBounds(10, 70, 46, 14);
-		frame.getContentPane().add(lblNewLabel_1);
+		JLabel lbl_keep = new JLabel("keep");
+		lbl_keep.setBounds(10, 70, 46, 14);
+		frame.getContentPane().add(lbl_keep);
 		
 		textField_keep = new JTextField();
 		textField_keep.setBounds(95, 67, 170, 20);
 		textField_keep.setColumns(10);
 		frame.getContentPane().add(textField_keep);
 		
-		lblNewLabel_2 = new JLabel("Subreddit");
-		lblNewLabel_2.setBounds(10, 11, 66, 14);
-		frame.getContentPane().add(lblNewLabel_2);
+		lbl_subreddit = new JLabel("Subreddit");
+		lbl_subreddit.setBounds(10, 11, 66, 14);
+		frame.getContentPane().add(lbl_subreddit);
 		
 		textField_Subreddit = new JTextField();
 		textField_Subreddit.setBounds(95, 8, 170, 20);
@@ -102,26 +102,16 @@ public class GUI {
 				"Posts", "Link"
 			});
 		table = new JTable(tableModel);
-		/*
-		table.setModel(
-		) {
-			Class[] columnTypes = new Class[] {
-				String.class, String.class
-			};
-			public Class getColumnClass(int columnIndex) {
-				return columnTypes[columnIndex];
-			}
-		});
-		*/
+
 		scrollPane.setViewportView(table);
 		
-		lblNewLabel_3 = new JLabel("r/");
-		lblNewLabel_3.setBounds(86, 11, 19, 14);
-		frame.getContentPane().add(lblNewLabel_3);
+		lbl_rSlash = new JLabel("r/");
+		lbl_rSlash.setBounds(86, 11, 19, 14);
+		frame.getContentPane().add(lbl_rSlash);
 		
-		lblNewLabel_4 = new JLabel("sort by");
-		lblNewLabel_4.setBounds(308, 11, 40, 14);
-		frame.getContentPane().add(lblNewLabel_4);
+		lbl_sortby = new JLabel("sort by");
+		lbl_sortby.setBounds(308, 11, 40, 14);
+		frame.getContentPane().add(lbl_sortby);
 		
 		JComboBox comboBox = new JComboBox();
 		comboBox.setModel(new DefaultComboBoxModel(SortEnum.values()));
@@ -131,7 +121,6 @@ public class GUI {
 		JButton btnApplyFilters = new JButton("apply Filters");
 		btnApplyFilters.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				DefaultTableModel model = (DefaultTableModel)table.getModel();
 				SortEnum sortEnum = (SortEnum) comboBox.getSelectedItem();
 				try {
 					Posts filteredposts = App.useFilter(textField_Subreddit.getText(), sortEnum, textField_keep.getText(), textField_remove.getText());
@@ -150,7 +139,6 @@ public class GUI {
 		btnGetPosts = new JButton("get Posts");
 		btnGetPosts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				DefaultTableModel model = (DefaultTableModel)table.getModel();
 				SortEnum sortEnum = (SortEnum) comboBox.getSelectedItem();
 				try {
 					Posts posts = App.getonlyPostsforGui(textField_Subreddit.getText(), sortEnum);
